@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace CQRSDemo.API.Models.Mongo
 {
-	public class CustomerEntity
+	public class CustomerViewEntity
 	{
 		[BsonElement("Id")]
-		public long Id { get; set; }
+		public string Id { get; set; }
 
 		[BsonElement("Email")]
 		public string Email { get; set; }
@@ -21,6 +21,6 @@ namespace CQRSDemo.API.Models.Mongo
 		public int Age { get; set; }
 
 		[BsonElement("Phones")]
-		public List<PhoneEntity> Phones { get; set; }
+		public List<PhoneViewEntity> Phones { get; set; }
 	}
 }

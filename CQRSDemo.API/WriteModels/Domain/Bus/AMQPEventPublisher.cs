@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using CQRSDemo.API.WriteModels.Events;
+using CQRSlite.Events;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -6,26 +8,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace CQRSDemo.API.Events
+namespace CQRSDemo.API.WriteModels.Domain.Bus
 {
-	public class Constants
-	{
-		public const string QUEUE_CUSTOMER_CREATED = "customer_created";
-		public const string QUEUE_CUSTOMER_UPDATED = "customer_updated";
-		public const string QUEUE_CUSTOMER_DELETED = "customer_deleted";
-	}
-
-	public interface IEvent
-	{
-	}
-
-	public class AMQPEventPublisher
+	public class AMQPEventPublisher : IEventPublisher
 	{
 		private readonly ConnectionFactory connectionFactory;
 
-		public AMQPEventPublisher(IWebHostEnvironment env)
+		public AMQPEventPublisher(IWebHostEnvironment env, AMQPEventSubscriber aMQPEventSubscriber)
 		{
 			connectionFactory = new ConnectionFactory();
 			var builder = new ConfigurationBuilder()
@@ -36,7 +28,7 @@ namespace CQRSDemo.API.Events
 			builder.Build().GetSection("amqp").Bind(connectionFactory);
 		}
 
-		public void PublishEvent<T>(T @event) where T : IEvent
+		public Task Publish<T>(T @event, CancellationToken cancellationToken) where T : class, IEvent
 		{
 			using (IConnection conn = connectionFactory.CreateConnection())
 			{
@@ -61,6 +53,7 @@ namespace CQRSDemo.API.Events
 					);
 				}
 			}
+			return Task.FromResult("");
 		}
-	}
+    }
 }

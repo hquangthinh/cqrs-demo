@@ -1,4 +1,4 @@
-﻿namespace CQRSDemo.API.Models
+﻿namespace CQRSDemo.API.Commons
 {
     public enum PhoneType
 	{

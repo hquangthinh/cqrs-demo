@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using CQRSDemo.API.Commons;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CQRSDemo.API.Models.Mongo
 {
-	public partial class PhoneEntity
+	public partial class PhoneViewEntity
 	{
 		[BsonElement("Type")]
 		public PhoneType Type { get; set; }

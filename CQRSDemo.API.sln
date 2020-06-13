@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CQRSDemo.API", "CQRSDemo.API\CQRSDemo.API.csproj", "{68C34732-7A5A-47AE-ABFD-D02208B841B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CQRSDemo.API", "CQRSDemo.API\CQRSDemo.API.csproj", "{68C34732-7A5A-47AE-ABFD-D02208B841B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CQRSlite", "CQRSlite\Framework\CQRSlite\CQRSlite.csproj", "{461CDC20-0BC9-4803-8E95-10132AA7717C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{68C34732-7A5A-47AE-ABFD-D02208B841B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68C34732-7A5A-47AE-ABFD-D02208B841B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68C34732-7A5A-47AE-ABFD-D02208B841B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{461CDC20-0BC9-4803-8E95-10132AA7717C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{461CDC20-0BC9-4803-8E95-10132AA7717C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{461CDC20-0BC9-4803-8E95-10132AA7717C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{461CDC20-0BC9-4803-8E95-10132AA7717C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

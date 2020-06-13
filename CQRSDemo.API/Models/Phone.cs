@@ -1,4 +1,6 @@
-﻿namespace CQRSDemo.API.Models
+﻿using CQRSDemo.API.Commons;
+
+namespace CQRSDemo.API.Models
 {
     public class Phone
 	{

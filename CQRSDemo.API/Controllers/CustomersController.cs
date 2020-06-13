@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CQRSDemo.API.Commands;
 using CQRSDemo.API.Models;
 using CQRSDemo.API.Models.Mongo;
 using CQRSDemo.API.Repositories;
-using CQRSDemo.API.Repositories.Mongo;
+using CQRSDemo.API.Services;
+using CQRSDemo.API.WriteModels.Commands;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,82 +15,106 @@ namespace CQRSDemo.API.Controllers
     [Route("api/[controller]")]
     public class CustomersController : Controller
     {
-        private readonly ICommandHandler<Command> _commandHandler;
-        private readonly CustomerMongoRepository _mongoRepository;
-        private readonly CustomerRepository _sqliteRepository;
+        private readonly ICustomerService _customerService;
 
-        public CustomersController(
-            ICommandHandler<Command> commandHandler,
-            CustomerRepository sqliteRepository,
-            CustomerMongoRepository repository
-        )
+        public CustomersController(ICustomerService customerService)
         {
-            _commandHandler = commandHandler;
-            _sqliteRepository = sqliteRepository;
-            _mongoRepository = repository;
+            _customerService = customerService;
         }
 
         [HttpGet]
-        public List<CustomerEntity> Get()
+        public Task<IActionResult> Get([FromQuery] string email)
         {
-            return _mongoRepository.GetCustomers();
+            return Task.Run(async () =>
+            {
+                if (email != null)
+                {
+                    IActionResult result = NotFound();
+                    var customer = await _customerService.GetCustomersByEmailAsync(email);
+                    if (customer != null)
+                    {
+                        result = new ObjectResult(customer);
+                    }
+                    return result;
+                }
+                else
+                {
+                    return new ObjectResult(await _customerService.GetAllCustomersAsync());
+                }
+            });
         }
 
         [HttpGet("{id}", Name = "GetCustomer")]
-        public IActionResult GetById(long id)
+        public Task<IActionResult> GetById(Guid id)
         {
-            var product = _mongoRepository.GetCustomer(id);
-            if (product == null)
+            return Task.Run(async () =>
             {
-                return NotFound();
-            }
-            return new ObjectResult(product);
-        }
-
-        [HttpGet("{email}")]
-        public IActionResult GetByEmail(string email)
-        {
-            var product = _mongoRepository.GetCustomerByEmail(email);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            return new ObjectResult(product);
+                IActionResult result = NotFound();
+                var customer = await _customerService.GetCustomerAsync(id);
+                if (customer != null)
+                {
+                    result = new ObjectResult(customer);
+                }
+                return result;
+            });
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] CreateCustomerCommand customer)
+        public Task<IActionResult> Post([FromBody] CreateCustomerCommand customer)
         {
-            _commandHandler.Execute(customer);
-            return CreatedAtRoute("GetCustomer", new { id = customer.Id }, customer);
+            customer.Id = Guid.NewGuid();
+            return Task.Run(async () =>
+            {
+                IActionResult result = NotFound();
+                bool created = await _customerService.IssueCommandAsync(customer);
+                if (created)
+                {
+                    result = CreatedAtRoute("GetCustomer", new { id = customer.Id }, customer);
+                }
+                return result;
+            });
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(long id, [FromBody] UpdateCustomerCommand customer)
+        public Task<IActionResult> Put(Guid id, [FromBody] UpdateCustomerCommand customer)
         {
-            var record = _sqliteRepository.GetById(id);
-            if (record == null)
+            return Task.Run(async () =>
             {
-                return NotFound();
-            }
-            customer.Id = id;
-            _commandHandler.Execute(customer);
-            return NoContent();
+                IActionResult result = NotFound();
+                var record = await _customerService.GetCustomerAsync(id);
+                if (record != null)
+                {
+                    customer.Id = id;
+                    bool updated = await _customerService.IssueCommandAsync(customer);
+                    if (updated)
+                    {
+                        result = NoContent();
+                    }
+                }
+                return result;
+            });
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(long id)
+        public Task<IActionResult> Delete(Guid id)
         {
-            var record = _sqliteRepository.GetById(id);
-            if (record == null)
+            return Task.Run(async () =>
             {
-                return NotFound();
-            }
-            _commandHandler.Execute(new DeleteCustomerCommand()
-            {
-                Id = id
+                IActionResult result = NotFound();
+                var record = await _customerService.GetCustomerAsync(id);
+                if (record != null)
+                {
+                    bool updated = await _customerService.IssueCommandAsync(new DeleteCustomerCommand()
+                    {
+                        Id = id
+                    });
+                    if (updated)
+                    {
+                        result = NoContent();
+                    }
+                }
+                return result;
             });
-            return NoContent();
         }
     }
 }
